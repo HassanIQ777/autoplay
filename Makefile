@@ -3,7 +3,7 @@
 # to have zero say in the matter.
 
 CXX := g++
-TARGET := program
+TARGET := autoplay
 BINDIR := .
 
 PREFIX  := $(HOME)/.local

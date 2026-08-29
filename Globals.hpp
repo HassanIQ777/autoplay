@@ -14,6 +14,11 @@ struct FilePaths {
   std::string home_dir, program_dir;  // directories
   std::string config_file, logs_file; // files
 
+  void init() {
+    assignPaths();
+    create();
+  }
+
   void assignPaths() {
     // print("Chose ", home_dir, " as a home directory\n");
     program_dir = fs::path(home_dir) / ".autoplay";

@@ -2,12 +2,14 @@
 
 #include "Globals.hpp"
 #include "helpers.hpp"
+#include "libutils/Input.hpp"
 #include "libutils/color.hpp"
 #include "libutils/funcs.hpp"
+#include <filesystem>
 #include <string>
 
 inline void printChoice(const std::string &num, const std::string &msg) {
-  print(color::TXT_YELLOW, num, ") ", color::TXT_GREEN, msg, color::A_RESET,
+  print(color::TXT_MAGENTA, num, ") ", color::TXT_GREEN, msg, color::A_RESET,
         "\n");
 }
 
@@ -27,6 +29,11 @@ inline void stateMainMenu() {
 
   std::string inp = funcs::getKeyPress();
   if (inp == "1") {
+    if (!File::isdirectory(g.settings.download_dir)) {
+      Log::error(false,
+                 "Download directory invalid, please set it in settings.");
+      return;
+    }
     g.state = AppState::Downloading;
   } else if (inp == "2") {
     g.state = AppState::Settings;
@@ -92,7 +99,7 @@ inline void stateWatching(const std::string &path) {
   }
 }
 
-inline void stateDownloading(const std::string &URL = "") {
+inline void stateDownloading(std::string URL = "") {
   static constexpr const char *LOGO = R"(▄        ▜      ▌▘    
 ▌▌▛▌▌▌▌▛▌▐ ▛▌▀▌▛▌▌▛▌▛▌
 ▙▘▙▌▚▚▘▌▌▐▖▙▌█▌▙▌▌▌▌▙▌
@@ -101,11 +108,18 @@ inline void stateDownloading(const std::string &URL = "") {
   print(LOGO, "\n");
   Globals &g = Globals::getInstance();
 
+  auto url_inp = Input::readline<std::string>("URL: ");
+  if (!url_inp) {
+    return;
+  }
+  URL = *url_inp;
+
   printChoice("1", "Video (Best Quality)");
   printChoice("2", "Video (720p)");
   printChoice("3", "Video (480p)");
   printChoice("4", "Video (360p)");
   printChoice("5", "Audio Only");
+  print("> ");
   std::string inp = funcs::getKeyPress();
 
   // --- flags shared by every mode ---
@@ -117,7 +131,7 @@ inline void stateDownloading(const std::string &URL = "") {
       " --embed-thumbnail"
       " --sponsorblock-remove sponsor"
       " --download-archive " +
-      shq(g.files.archive_file) +
+      shq(g.files.program_dir / fs::path("archive.txt")) +
       " --ignore-errors"
       " --sleep-subtitles 2"
       " --user-agent " +
@@ -180,10 +194,50 @@ inline void stateDownloading(const std::string &URL = "") {
   if (!File::isfile(downloadedPath)) {
     print("Failed to download media.\n");
     funcs::getKeyPress();
+    g.state = AppState::MainMenu;
     return;
   }
 
   stateWatching(downloadedPath);
 }
 
-inline void stateSettings() {}
+inline void stateSettings() {
+  static constexpr const char *LOGO = R"(▄▖  ▗ ▗ ▘      
+▚ █▌▜▘▜▘▌▛▌▛▌▛▘
+▄▌▙▖▐▖▐▖▌▌▌▙▌▄▌
+           ▄▌  )";
+
+  print(LOGO, "\n");
+  Globals &g = Globals::getInstance();
+
+  std::string download_path = g.settings.download_dir;
+  if (!download_path.empty()) {
+    download_path = fs::absolute(g.settings.download_dir);
+  }
+  printChoice("1", "Download path = " + download_path);
+  // printChoice("2", "");
+  print("\n");
+  printChoice("9", "Back");
+
+  std::string inp = funcs::getKeyPress();
+
+  if (inp == "1") {
+    print("New path: ");
+    auto path = Input::readline<std::string>();
+    if (!path) {
+      return;
+    }
+    if (!File::isdirectory(*path)) {
+      Log::warn("Invalid path to a directory.");
+      funcs::getKeyPress();
+      return;
+    }
+    g.settings.download_dir = *path;
+
+    // } else if (inp == "2") {
+  } else if (inp == "9") {
+    g.state = AppState::MainMenu;
+  }
+
+  g.settings.save(g.files.settings_file);
+}

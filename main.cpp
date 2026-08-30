@@ -8,6 +8,7 @@ int main(int argc, char **argv) {
   g.parser.setArgs(argc, argv);
   parseArgs(g);
   g.files.init();
+  g.settings.loadOrCreate(g.files.settings_file);
 
   while (g.state != AppState::Quit) {
     funcs::clearTerminal();

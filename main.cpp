@@ -1,4 +1,5 @@
 #include "Globals.hpp"
+#include "app_states.hpp"
 #include "helpers.hpp"
 #include "libutils/CLIParser.hpp"
 
@@ -13,17 +14,14 @@ int main(int argc, char **argv) {
     printLogo();
 
     switch (g.state) {
-    case AppState::Start:
-      //   state_start();
+    case AppState::MainMenu:
+      stateMainMenu();
       break;
-    case AppState::Watching:
-      //   state_watching();
+    case AppState::Downloading:
+      stateDownloading();
       break;
     case AppState::Settings:
-      //   state_settings();
-      break;
-      // case AppState::Settings:
-      //   state_settings();
+      stateSettings();
       break;
     case AppState::Quit:
       break;

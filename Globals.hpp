@@ -10,9 +10,13 @@
 using funcs::print;
 namespace fs = std::filesystem;
 
+struct Settings {
+  std::string download_dir;
+};
+
 struct FilePaths {
-  std::string home_dir, program_dir;  // directories
-  std::string config_file, logs_file; // files
+  std::string home_dir, program_dir;                // directories
+  std::string config_file, logs_file, archive_file; // files
 
   void init() {
     assignPaths();
@@ -62,13 +66,14 @@ struct FilePaths {
   }
 };
 
-enum class AppState { Start, Watching, Settings, Quit };
+enum class AppState { MainMenu, Downloading, Settings, Quit };
 
 struct Globals {
   std::string VERSION = "26.8.30";
   FilePaths files;
   CLIParser parser;
-  AppState state = AppState::Start;
+  AppState state = AppState::MainMenu;
+  Settings settings;
 
   static Globals &getInstance() {
     static Globals g;

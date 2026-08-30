@@ -61,8 +61,54 @@ inline std::string getdate() {
 }
 
 inline void printLogo() {
-  static constexpr const char *LOGO = R"()";
+  static constexpr const char *LOGO =
+      R"(▄████▄ ▄▄ ▄▄ ▄▄▄▄▄▄ ▄▄▄  ▄▄▄▄  ▄▄     ▄▄▄  ▄▄ ▄▄ 
+██▄▄██ ██ ██   ██  ██▀██ ██▄█▀ ██    ██▀██ ▀███▀ 
+██  ██ ▀███▀   ██  ▀███▀ ██    ██▄▄▄ ██▀██   █   
+)";
   std::string date = getdate();
   funcs::printLeftMiddleRight("", "", date);
   print("\n", color::TXT_YELLOW, color::A_BOLD, LOGO, color::A_RESET, "\n");
+}
+
+inline std::string shq(const std::string &s) {
+  std::string out = "'";
+  for (char c : s) {
+    if (c == '\'')
+      out += "'\\''";
+    else
+      out += c;
+  }
+  out += "'";
+  return out;
+}
+
+// Joins a directory with a filename template, collapsing a trailing slash
+// on dir so you never end up with "//%(title)s..." either way.
+inline std::string joinOutPath(const std::string &dir,
+                               const std::string &tmpl) {
+  if (!dir.empty() && dir.back() == '/')
+    return dir + tmpl;
+  return dir + "/" + tmpl;
+}
+
+// Metadata-only lookup: no download happens, since --print without a
+// later WHEN: stage implies --simulate. Returns the sanitized title
+// yt-dlp would actually use in the filename.
+inline std::string getSanitizedTitle(const std::string &url) {
+  std::string cmd = "yt-dlp --print filename -o " + shq("%(title)s") + " " +
+                    shq(url) + " 2>/dev/null";
+  FILE *pipe = popen(cmd.c_str(), "r");
+  if (!pipe)
+    throw std::runtime_error("popen failed");
+  std::string title;
+  char buf[4096];
+  while (fgets(buf, sizeof(buf), pipe))
+    title += buf;
+  int rc = pclose(pipe);
+  while (!title.empty() && (title.back() == '\n' || title.back() == '\r'))
+    title.pop_back();
+  if (rc != 0 || title.empty())
+    throw std::runtime_error("failed to resolve title for " + url);
+  return title;
 }

@@ -9,9 +9,14 @@ int main(int argc, char **argv) {
   parseArgs(g);
   g.files.init();
   g.settings.loadOrCreate(g.files.settings_file);
+  LOG("User started program");
 
-  // TODO: implement
-  // if(argc == 3){}
+  if (funcs::hasSequence(g.parser.getArg(1), "http")) {
+    g.state = AppState::Downloading;
+    funcs::clearTerminal();
+    printLogo(); // بدون مجاملة
+    stateDownloading(g.parser.getArg(1));
+  }
 
   while (g.state != AppState::Quit) {
     funcs::clearTerminal();
@@ -31,4 +36,5 @@ int main(int argc, char **argv) {
       break;
     }
   }
+  LOG("User quit program");
 }

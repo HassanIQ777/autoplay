@@ -2,6 +2,7 @@
 
 #include "Globals.hpp"
 #include "libutils/color.hpp"
+#include "libutils/funcs.hpp"
 #include <cstdlib>
 
 inline void LOG(const std::string &msg) {
@@ -32,15 +33,14 @@ inline void parseArgs(Globals &globals) {
 
   // if no args were provided, use $HOME the environment variable
   if (char *home = getenv("HOME");
-      home != nullptr && globals.parser.getArgc() == 1) {
+      home != nullptr &&
+      (globals.parser.getArgc() == 1 || !File::isdirectory(first_arg))) {
     globals.files.home_dir = home;
     return;
   }
 
   if (File::isdirectory(first_arg)) {
     globals.files.home_dir = first_arg;
-  } else {
-    Log::error(1, "The provided path is not a directory.");
   }
 }
 
@@ -50,16 +50,16 @@ inline std::string getdate() {
   const std::tm tm = *std::localtime(&time);
 
   std::ostringstream oss;
-  oss << std::put_time(&tm, "%a %b %d %I:%M %p");
-  //  this format looks like: Sat Jun 06 01:09 AM
+  oss << std::put_time(&tm, "%I:%M %p");
+  //  this format looks like: 01:09 AM
   return oss.str();
 }
 
 inline void printLogo() {
   static constexpr const char *LOGO =
-      R"(▄████▄ ▄▄ ▄▄ ▄▄▄▄▄▄ ▄▄▄  ▄▄▄▄  ▄▄     ▄▄▄  ▄▄ ▄▄ 
-██▄▄██ ██ ██   ██  ██▀██ ██▄█▀ ██    ██▀██ ▀███▀ 
-██  ██ ▀███▀   ██  ▀███▀ ██    ██▄▄▄ ██▀██   █   
+      R"(        ▄████▄ ▄▄ ▄▄ ▄▄▄▄▄▄ ▄▄▄  ▄▄▄▄  ▄▄     ▄▄▄  ▄▄ ▄▄ 
+        ██▄▄██ ██ ██   ██  ██▀██ ██▄█▀ ██    ██▀██ ▀███▀ 
+        ██  ██ ▀███▀   ██  ▀███▀ ██    ██▄▄▄ ██▀██   █   
 )";
   std::string date = getdate();
   funcs::printLeftMiddleRight("", "", date);

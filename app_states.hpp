@@ -5,6 +5,7 @@
 #include "libutils/Input.hpp"
 #include "libutils/color.hpp"
 #include "libutils/funcs.hpp"
+#include "libutils/strutils.hpp"
 #include <filesystem>
 #include <string>
 
@@ -88,7 +89,7 @@ inline void stateWatching(const std::string &path) {
       }
     } else if (inp == "2") {
       if (!File::removefile(path)) {
-        Log::warn("Failed to remove '", path, "'");
+        Log::warn("[autoplay] Failed to remove '", path, "'");
         funcs::getKeyPress();
         return;
       }
@@ -111,7 +112,7 @@ inline void stateDownloading(std::string URL = "") {
   print(LOGO, "\n");
   Globals &g = Globals::getInstance();
 
-  if (URL != "") {
+  if (URL == "") {
     auto url_inp = Input::readline<std::string>("URL: ");
     if (!url_inp) {
       return;
@@ -119,6 +120,14 @@ inline void stateDownloading(std::string URL = "") {
     URL = *url_inp;
   }
 
+  // cancel downloading
+  if (URL == "") {
+    g.state = AppState::MainMenu;
+    return;
+  }
+
+  print("Select option for '", URL, "':\n");
+  print("─────────────────────", strutils::repeat("─", URL.size()), "\n");
   printChoice("1", "Video (Best Quality)");
   printChoice("2", "Video (720p)");
   printChoice("3", "Video (480p)");
@@ -126,6 +135,7 @@ inline void stateDownloading(std::string URL = "") {
   printChoice("5", "Audio Only");
   print("> ");
   std::string inp = funcs::getKeyPress();
+  print("\nStarted downloading...\n");
 
   // --- flags shared by every mode ---
   std::string commonFlags =
@@ -194,7 +204,7 @@ inline void stateDownloading(std::string URL = "") {
       joinOutPath(g.settings.download_dir, title + "." + ext);
 
   if (!File::isfile(downloadedPath)) {
-    print("Failed to download media.\n");
+    print("[autoplay] Failed to download media.\n");
     funcs::getKeyPress();
     g.state = AppState::MainMenu;
     return;

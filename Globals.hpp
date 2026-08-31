@@ -10,7 +10,6 @@
 
 using funcs::print;
 using json = nlohmann::json;
-namespace fs = std::filesystem;
 
 struct Settings {
   std::string download_dir = "";
@@ -124,7 +123,7 @@ struct FilePaths {
 enum class AppState { MainMenu, Downloading, Settings, Quit };
 
 struct Globals {
-  std::string VERSION = "26.8.31-1";
+  std::string VERSION = "26.8.31-3";
   FilePaths files;
   CLIParser parser;
   AppState state = AppState::MainMenu;

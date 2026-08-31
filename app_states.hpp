@@ -217,7 +217,7 @@ inline void stateSettings() {
     download_path = fs::absolute(g.settings.download_dir);
   }
   printChoice("1", "Download path = " + download_path);
-  // printChoice("2", "");
+  print("\nUsing '", g.files.program_dir, "' as the program's directory.\n");
   print("\n");
   printChoice("9", "Back");
 

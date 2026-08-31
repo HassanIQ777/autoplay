@@ -2,6 +2,7 @@
 
 #include "Globals.hpp"
 #include "libutils/color.hpp"
+#include <cstdlib>
 
 inline void LOG(const std::string &msg) {
   Globals &globals = Globals::getInstance();
@@ -13,25 +14,13 @@ inline void LOG(const std::string &msg) {
 inline void printHelp(Globals &globals) {
   const std::string program_name = globals.parser.getArg(0);
   print("Usage:\n");
+  print("  ", program_name, "\n");
   print("  ", program_name, " <HOME_DIR>\n");
   print("  ", program_name, " -h    print this help message\n");
   print("  ", program_name, " -v    print version\n");
 }
 
 inline void parseArgs(Globals &globals) {
-  // if (int argc = globals.parser.getArgc(); argc != 2) {
-  //   if (argc == 1) {
-  //     Log::error(0, "One argument is required but nothing was provided.");
-
-  //   } else {
-
-  //     Log::error(0, "One argument is required but " + funcs::str(argc - 1) +
-  //                       " arguments were provided.");
-  //   }
-  //   printHelp(globals);
-  //   exit(EXIT_FAILURE);
-  // }
-
   const std::string first_arg = globals.parser.getArg(1);
   if (first_arg == "-h") {
     printHelp(globals);
@@ -39,6 +28,13 @@ inline void parseArgs(Globals &globals) {
   } else if (first_arg == "-v") {
     print("autoplay version ", globals.VERSION, "\n");
     exit(0);
+  }
+
+  // if no args were provided, use $HOME the environment variable
+  if (char *home = getenv("HOME");
+      home != nullptr && globals.parser.getArgc() == 1) {
+    globals.files.home_dir = home;
+    return;
   }
 
   if (File::isdirectory(first_arg)) {

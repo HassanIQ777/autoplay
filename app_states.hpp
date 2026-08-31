@@ -90,7 +90,10 @@ inline void stateWatching(const std::string &path) {
       if (!File::removefile(path)) {
         Log::warn("Failed to remove '", path, "'");
         funcs::getKeyPress();
+        return;
       }
+      print("Successfully removed '", File::getFileName(path), "'\n");
+      funcs::getKeyPress();
       break;
     } else if (inp == "9") {
       g.state = AppState::MainMenu;
@@ -108,11 +111,13 @@ inline void stateDownloading(std::string URL = "") {
   print(LOGO, "\n");
   Globals &g = Globals::getInstance();
 
-  auto url_inp = Input::readline<std::string>("URL: ");
-  if (!url_inp) {
-    return;
+  if (URL != "") {
+    auto url_inp = Input::readline<std::string>("URL: ");
+    if (!url_inp) {
+      return;
+    }
+    URL = *url_inp;
   }
-  URL = *url_inp;
 
   printChoice("1", "Video (Best Quality)");
   printChoice("2", "Video (720p)");
@@ -129,9 +134,6 @@ inline void stateDownloading(std::string URL = "") {
       shq("aria2c:-x 16 -s 16 -k 1M") +
       " --embed-metadata"
       " --embed-thumbnail"
-      " --sponsorblock-remove sponsor"
-      " --download-archive " +
-      shq(g.files.program_dir / fs::path("archive.txt")) +
       " --ignore-errors"
       " --sleep-subtitles 2"
       " --user-agent " +

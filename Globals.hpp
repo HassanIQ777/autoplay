@@ -124,7 +124,7 @@ struct FilePaths {
 enum class AppState { MainMenu, Downloading, Settings, Quit };
 
 struct Globals {
-  std::string VERSION = "26.8.30";
+  std::string VERSION = "26.8.31-1";
   FilePaths files;
   CLIParser parser;
   AppState state = AppState::MainMenu;

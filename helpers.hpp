@@ -19,26 +19,25 @@ inline void printHelp(Globals &globals) {
 }
 
 inline void parseArgs(Globals &globals) {
-  if (int argc = globals.parser.getArgc(); argc != 2) {
-    if (argc == 1) {
-      Log::error(0, "One argument is required but nothing was provided.");
+  // if (int argc = globals.parser.getArgc(); argc != 2) {
+  //   if (argc == 1) {
+  //     Log::error(0, "One argument is required but nothing was provided.");
 
-    } else {
+  //   } else {
 
-      Log::error(0, "One argument is required but " +
-                        funcs::str(globals.parser.getArgc() - 1) +
-                        " arguments were provided.");
-    }
-    printHelp(globals);
-    exit(EXIT_FAILURE);
-  }
+  //     Log::error(0, "One argument is required but " + funcs::str(argc - 1) +
+  //                       " arguments were provided.");
+  //   }
+  //   printHelp(globals);
+  //   exit(EXIT_FAILURE);
+  // }
 
   const std::string first_arg = globals.parser.getArg(1);
   if (first_arg == "-h") {
     printHelp(globals);
     exit(0);
   } else if (first_arg == "-v") {
-    print("about-today version ", globals.VERSION, "\n");
+    print("autoplay version ", globals.VERSION, "\n");
     exit(0);
   }
 

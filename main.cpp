@@ -10,6 +10,9 @@ int main(int argc, char **argv) {
   g.files.init();
   g.settings.loadOrCreate(g.files.settings_file);
 
+  // TODO: implement
+  // if(argc == 3){}
+
   while (g.state != AppState::Quit) {
     funcs::clearTerminal();
     printLogo();

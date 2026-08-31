@@ -4,6 +4,7 @@
 #include "helpers.hpp"
 #include "libutils/Input.hpp"
 #include "libutils/color.hpp"
+#include "libutils/cursor.hpp"
 #include "libutils/funcs.hpp"
 #include "libutils/strutils.hpp"
 #include <filesystem>
@@ -82,9 +83,9 @@ inline void stateWatching(const std::string &path) {
       // launch in Android's MPV Player
       if (g.isMobileDevice && isVideoFile(path)) {
         const std::string command =
-                "am start -a android.intent.action.VIEW -d \"file://" + path +
-                "\" -n is.xyz.mpv/.MPVActivity";
-            system(command.c_str());
+            "am start -a android.intent.action.VIEW -d \"file://" + path +
+            "\" -n is.xyz.mpv/.MPVActivity";
+        system(command.c_str());
       } else {
         std::string cmd = "mpv " + shq(path);
         int rc = system(cmd.c_str());
@@ -96,14 +97,15 @@ inline void stateWatching(const std::string &path) {
         }
       }
     } else if (inp == "2") {
+      g.state = AppState::MainMenu;
       if (!File::removefile(path)) {
         Log::warn("[autoplay] Failed to remove '", path, "'");
-        funcs::getKeyPress();
-        return;
+      } else {
+        print("Successfully removed '", File::getFileName(path), "'\n");
       }
-      print("Successfully removed '", File::getFileName(path), "'\n");
+      print("Press anything to go back to main menu\n");
       funcs::getKeyPress();
-      break;
+      return;
     } else if (inp == "9") {
       g.state = AppState::MainMenu;
       break;
@@ -120,12 +122,14 @@ inline void stateDownloading(std::string URL = "") {
   print(LOGO, "\n");
   Globals &g = Globals::getInstance();
 
+  bool goUp = false;
   if (URL == "") {
     auto url_inp = Input::readline<std::string>("URL: ");
     if (!url_inp) {
       return;
     }
     URL = *url_inp;
+    goUp = true;
   }
 
   // cancel downloading
@@ -134,8 +138,12 @@ inline void stateDownloading(std::string URL = "") {
     return;
   }
 
+  if (goUp) {
+    cursor::up();
+  }
   print("Select option for '", URL, "':\n");
   print("─────────────────────", strutils::repeat("─", URL.size()), "\n");
+  printChoice("0", "Cancel");
   printChoice("1", "Video (Best Quality)");
   printChoice("2", "Video (720p)");
   printChoice("3", "Video (480p)");
@@ -143,6 +151,12 @@ inline void stateDownloading(std::string URL = "") {
   printChoice("5", "Audio Only");
   print("> ");
   std::string inp = funcs::getKeyPress();
+
+  if (inp == "0") {
+    g.state = AppState::MainMenu;
+    return;
+  }
+
   print("\nStarted downloading...\n");
 
   // --- flags shared by every mode ---

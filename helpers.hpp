@@ -107,3 +107,14 @@ inline std::string getSanitizedTitle(const std::string &url) {
     throw std::runtime_error("failed to resolve title for " + url);
   return title;
 }
+
+inline bool isVideoFile(const std::string &filename) {
+  static const std::vector<std::string> VIDEO_EXTENSIONS = {
+      ".mp4", ".mkv", ".mov", ".avi", ".wmv", ".flv", ".webm", ".mpeg"};
+
+  std::string ext = File::getExtension(filename);
+  std::transform(ext.begin(), ext.end(), ext.begin(),
+                 ::tolower); // Convert to lowercase
+  return std::find(VIDEO_EXTENSIONS.begin(), VIDEO_EXTENSIONS.end(), ext) !=
+         VIDEO_EXTENSIONS.end();
+}

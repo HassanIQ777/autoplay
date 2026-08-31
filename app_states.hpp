@@ -79,13 +79,21 @@ inline void stateWatching(const std::string &path) {
 
     std::string inp = funcs::getKeyPress();
     if (inp == "1") {
-      std::string cmd = "mpv " + shq(path);
-      int rc = system(cmd.c_str());
-      if (rc != 0) {
-        auto msg = "[!] mpv exited with a non-zero status.";
-        LOG(msg);
-        print(msg, "\n");
-        funcs::getKeyPress();
+      // launch in Android's MPV Player
+      if (g.isMobileDevice && isVideoFile(path)) {
+        const std::string command =
+                "am start -a android.intent.action.VIEW -d \"file://" + path +
+                "\" -n is.xyz.mpv/.MPVActivity";
+            system(command.c_str());
+      } else {
+        std::string cmd = "mpv " + shq(path);
+        int rc = system(cmd.c_str());
+        if (rc != 0) {
+          auto msg = "[!] mpv exited with a non-zero status.";
+          LOG(msg);
+          print(msg, "\n");
+          funcs::getKeyPress();
+        }
       }
     } else if (inp == "2") {
       if (!File::removefile(path)) {

@@ -123,11 +123,12 @@ struct FilePaths {
 enum class AppState { MainMenu, Downloading, Settings, Quit };
 
 struct Globals {
-  std::string VERSION = "26.8.31-4";
+  std::string VERSION = "26.9.1";
   FilePaths files;
   CLIParser parser;
   AppState state = AppState::MainMenu;
   Settings settings;
+  bool isMobileDevice = getenv("ANDROID_DATA") != nullptr;
 
   static Globals &getInstance() {
     static Globals g;

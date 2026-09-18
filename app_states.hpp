@@ -81,6 +81,7 @@ inline void stateWatching(const std::string &path) {
     std::string inp = funcs::getKeyPress();
     if (inp == "1") {
       // launch in Android's MPV Player
+      LOG("playing: '" + path + "'");
       if (g.isMobileDevice && isVideoFile(path)) {
         const std::string command =
             "am start -a android.intent.action.VIEW -d \"file://" + path +
@@ -99,9 +100,13 @@ inline void stateWatching(const std::string &path) {
     } else if (inp == "2") {
       g.state = AppState::MainMenu;
       if (!File::removefile(path)) {
-        Log::warn("[autoplay] Failed to remove '", path, "'");
+        auto msg = "[autoplay] Failed to remove '" + path + "'";
+        Log::warn(msg);
+        LOG(msg);
       } else {
-        print("Successfully removed '", File::getFileName(path), "'\n");
+        auto msg = "[autoplay] Successfully removed '" + File::getFileName(path) + "'";
+        print(msg, "\n");
+        LOG(msg);
       }
       print("Press anything to go back to main menu\n");
       funcs::getKeyPress();
@@ -158,6 +163,7 @@ inline void stateDownloading(std::string URL = "") {
   }
 
   print("\nStarted downloading...\n");
+  LOG("Started downloading: (" + URL = ")");
 
   // --- flags shared by every mode ---
   std::string commonFlags =
@@ -245,8 +251,7 @@ inline void stateSettings() {
   Globals &g = Globals::getInstance();
 
   std::string download_path = g.settings.download_dir;
-  const std::string add_thumbnail_str =
-      (g.settings.add_thumbnail) ? "Yes" : "No";
+  std::string add_thumbnail_str = (g.settings.add_thumbnail) ? "Yes" : "No";
   if (!download_path.empty()) {
     download_path = fs::absolute(g.settings.download_dir);
   }
@@ -270,9 +275,12 @@ inline void stateSettings() {
       return;
     }
     g.settings.download_dir = *path;
+    LOG("[Settings] Changed download path to: '" + *path + "'");
 
   } else if (inp == "2") {
     g.settings.add_thumbnail = !g.settings.add_thumbnail;
+    add_thumbnail_str = (g.settings.add_thumbnail) ? "Yes" : "No";
+    LOG("[Settings] Add thumbnail: " + add_thumbnail_str);
   } else if (inp == "9") {
     g.state = AppState::MainMenu;
   }

@@ -114,12 +114,9 @@ struct FilePaths {
   bool createFile(const std::string &fp) {
     if (!File::isfile(fp)) {
       if (File::createfile(fp)) {
-        // LOG("Successfully created '" + fp + "'");
-        return true; // we newly created this
+        return true; // we successfully created this
       } else {
-        // LOG("Failed to create '" + fp + "'");instance-method operator=
-
-        exit(-3);
+        Log::error(1, "Unable to create: '", fp, "'");
       }
     }
     return false; // already created
@@ -129,7 +126,7 @@ struct FilePaths {
 enum class AppState { MainMenu, Downloading, Settings, Quit };
 
 struct Globals {
-  std::string VERSION = "v26.9.18";
+  std::string VERSION = "v26.9.18-3";
   FilePaths files;
   CLIParser parser;
   AppState state = AppState::MainMenu;

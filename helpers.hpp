@@ -9,7 +9,7 @@ inline void LOG(const std::string &msg) {
   Globals &globals = Globals::getInstance();
   std::string date = funcs::currentTime();
   std::string output = date + " -> " + msg;
-  File::insertline(globals.files.logs_file, output, 0);
+  File::appendline(globals.files.logs_file, output);
 }
 
 inline void printHelp(Globals &globals) {

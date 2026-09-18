@@ -36,6 +36,9 @@ int main(int argc, char **argv) {
     case AppState::Settings:
       stateSettings();
       break;
+    case AppState::Help:
+      stateHelp();
+      break;
     case AppState::Quit:
       break;
     }

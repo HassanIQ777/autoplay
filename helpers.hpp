@@ -12,20 +12,21 @@ inline void LOG(const std::string &msg) {
   File::appendline(globals.files.logs_file, output);
 }
 
-inline void printHelp(Globals &globals) {
+inline void printHelp() {
+  Globals &globals = Globals::getInstance();
   const std::string program_name = globals.parser.getArg(0);
   print("Usage:\n");
-  print("  ", program_name, "\n");
-  print("  ", program_name, " <URL>\n");
-  print("  ", program_name, " <HOME_DIR>\n");
-  print("  ", program_name, " -h    print this help message\n");
-  print("  ", program_name, " -v    print version\n");
+  print("  ", program_name, "                Start program normally\n");
+  print("  ", program_name, " <URL>          Immediately start in downloading state\n");
+  print("  ", program_name, " <HOME_DIR>     Manually choose home directory\n");
+  print("  ", program_name, " -h             print this help message\n");
+  print("  ", program_name, " -v             print version\n");
 }
 
 inline void parseArgs(Globals &globals) {
   const std::string first_arg = globals.parser.getArg(1);
   if (first_arg == "-h") {
-    printHelp(globals);
+    printHelp();
     exit(0);
   } else if (first_arg == "-v") {
     print("autoplay ", globals.VERSION, "\n");

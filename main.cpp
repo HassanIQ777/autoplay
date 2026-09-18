@@ -3,6 +3,9 @@
 #include "helpers.hpp"
 #include "libutils/CLIParser.hpp"
 
+// TODO: add flag --audio-only to audio only
+// TODO: Add more logging with LOG()
+
 int main(int argc, char **argv) {
   Globals &g = Globals::getInstance();
   g.parser.setArgs(argc, argv);

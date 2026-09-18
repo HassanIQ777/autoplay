@@ -13,16 +13,21 @@ using json = nlohmann::json;
 
 struct Settings {
   std::string download_dir = "";
+  bool add_thumbnail = true;
 
   static Settings defaults() { return Settings{}; }
 
   static Settings fromJson(const json &j) {
     Settings s = defaults(); // start from defaults
     s.download_dir = j.value("download_dir", s.download_dir);
+    s.add_thumbnail = j.value("add_thumbnail", s.add_thumbnail);
     return s;
   }
 
-  json toJson() const { return json{{"download_dir", download_dir}}; }
+  json toJson() const {
+    return json{{"download_dir", download_dir},
+                {"add_thumbnail", add_thumbnail}};
+  }
 
   void save(const std::string &filepath) {
     // Make sure parent dirs exist first
@@ -112,7 +117,8 @@ struct FilePaths {
         // LOG("Successfully created '" + fp + "'");
         return true; // we newly created this
       } else {
-        // LOG("Failed to create '" + fp + "'");
+        // LOG("Failed to create '" + fp + "'");instance-method operator=
+
         exit(-3);
       }
     }
@@ -123,7 +129,7 @@ struct FilePaths {
 enum class AppState { MainMenu, Downloading, Settings, Quit };
 
 struct Globals {
-  std::string VERSION = "v26.9.1-2";
+  std::string VERSION = "v26.9.18";
   FilePaths files;
   CLIParser parser;
   AppState state = AppState::MainMenu;

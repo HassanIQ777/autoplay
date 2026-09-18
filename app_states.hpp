@@ -106,7 +106,7 @@ inline void stateWatching(const std::string &path) {
       print("Press anything to go back to main menu\n");
       funcs::getKeyPress();
       return;
-    } else if (inp == "9") {
+    } else if (inp == "9" || inp == "q" || inp == "0") {
       g.state = AppState::MainMenu;
       break;
     }
@@ -245,15 +245,18 @@ inline void stateSettings() {
   Globals &g = Globals::getInstance();
 
   std::string download_path = g.settings.download_dir;
+  const std::string add_thumbnail_str =
+      (g.settings.add_thumbnail) ? "Yes" : "No";
   if (!download_path.empty()) {
     download_path = fs::absolute(g.settings.download_dir);
   }
-  printChoice("1", "Download path = " + download_path);
+  printChoice("1", "Download path: " + download_path);
+  printChoice("2", "Add thumbnail: " + add_thumbnail_str);
   print("\nUsing '", g.files.program_dir, "' as the program's directory.\n");
   print("\n");
   printChoice("9", "Back");
 
-  std::string inp = funcs::getKeyPress();
+  const std::string inp = funcs::getKeyPress();
 
   if (inp == "1") {
     print("New path: ");
@@ -268,7 +271,8 @@ inline void stateSettings() {
     }
     g.settings.download_dir = *path;
 
-    // } else if (inp == "2") {
+  } else if (inp == "2") {
+    g.settings.add_thumbnail = !g.settings.add_thumbnail;
   } else if (inp == "9") {
     g.state = AppState::MainMenu;
   }

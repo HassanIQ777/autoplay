@@ -5,6 +5,7 @@
 
 // TODO: add flag --audio-only to audio only
 // TODO: Add more logging with LOG()
+// TODO: Add AppState::Help
 
 int main(int argc, char **argv) {
   Globals &g = Globals::getInstance();

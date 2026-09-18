@@ -207,7 +207,7 @@ inline void stateDownloading(std::string URL = "") {
 
   std::string cmd = "yt-dlp ";
   if (audioOnly) {
-    cmd += "-x --audio-format mp3 --audio-quality 0 " + commonFlags;
+    cmd += "-x --audio-format mp3 --audio-quality 0 --no-video " + commonFlags;
   } else {
     cmd += "-f " + shq(format) + " " + commonFlags + " " + videoFlags;
   }

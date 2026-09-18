@@ -14,6 +14,7 @@ using json = nlohmann::json;
 struct Settings {
   std::string download_dir = "";
   bool add_thumbnail = true;
+  bool add_metadata = true;
 
   static Settings defaults() { return Settings{}; }
 
@@ -21,12 +22,15 @@ struct Settings {
     Settings s = defaults(); // start from defaults
     s.download_dir = j.value("download_dir", s.download_dir);
     s.add_thumbnail = j.value("add_thumbnail", s.add_thumbnail);
+    s.add_thumbnail = j.value("add_metadata", s.add_metadata);
+
     return s;
   }
 
   json toJson() const {
     return json{{"download_dir", download_dir},
-                {"add_thumbnail", add_thumbnail}};
+                {"add_thumbnail", add_thumbnail},
+                {"add_metadata", add_metadata}};
   }
 
   void save(const std::string &filepath) {
@@ -126,7 +130,7 @@ struct FilePaths {
 enum class AppState { MainMenu, Downloading, Settings, Help, Quit };
 
 struct Globals {
-  std::string VERSION = "v26.9.18-5";
+  std::string VERSION = "v26.9.18-7";
   FilePaths files;
   CLIParser parser;
   AppState state = AppState::MainMenu;

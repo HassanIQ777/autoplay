@@ -175,7 +175,6 @@ inline void stateDownloading(std::string URL = "") {
       "--downloader aria2c"
       " --downloader-args " +
       shq("aria2c:-x 16 -s 16 -k 1M") +
-      " --embed-metadata"
       " --ignore-errors"
       " --sleep-subtitles 2"
       " --user-agent " +
@@ -187,12 +186,14 @@ inline void stateDownloading(std::string URL = "") {
   // nonstandard Deno path. Only add it if deno is actually installed AND
   // this yt-dlp build supports the flag, so this never breaks on an
   // older/different yt-dlp binary that lacks it.
-  if (commandExists("deno") && ytdlpSupportsJsRuntimes()) {
+  if (commandExists("deno") && ytdlpSupportsJsRuntimes())
     commonFlags += " --js-runtimes deno";
-  }
-  if (g.settings.add_thumbnail) {
+
+  if (g.settings.add_thumbnail)
     commonFlags += " --embed-thumbnail";
-  }
+
+  if (g.settings.add_metadata)
+    commonFlags += " --embed-metadata";
 
   static const std::string videoFlags = "--merge-output-format mkv"
                                         " --embed-subs"
@@ -220,7 +221,9 @@ inline void stateDownloading(std::string URL = "") {
 
   std::string cmd = "yt-dlp ";
   if (audioOnly) {
-    cmd += "-x --audio-format mp3 --audio-quality 0 --no-video " + commonFlags;
+    cmd += "-x --audio-format mp3 --audio-quality 0 --no-video "
+           "--audio-display=no " +
+           commonFlags;
   } else {
     cmd += "-f " + shq(format) + " " + commonFlags + " " + videoFlags;
   }
@@ -243,9 +246,15 @@ inline void stateDownloading(std::string URL = "") {
   if (!File::isfile(downloadedPath)) {
     print("[autoplay] Failed to download media.\n");
     download_failed = true;
-    funcs::getKeyPress();
-    g.state = AppState::MainMenu;
-    return;
+  }
+
+  if (download_failed) {
+    auto inp = Input::readline<std::string>("\nRetry download [Y/n]? ");
+    if (funcs::uppercase(*inp) == "N") {
+      g.state = AppState::MainMenu;
+      return;
+    }
+    stateDownloading(URL);
   }
 
   stateWatching(downloadedPath);
@@ -262,11 +271,13 @@ inline void stateSettings() {
 
   std::string download_path = g.settings.download_dir;
   std::string add_thumbnail_str = (g.settings.add_thumbnail) ? "Yes" : "No";
+  std::string add_metadata_str = (g.settings.add_metadata) ? "Yes" : "No";
   if (!download_path.empty()) {
     download_path = fs::absolute(g.settings.download_dir);
   }
   printChoice("1", "Download path: " + download_path);
   printChoice("2", "Add thumbnail: " + add_thumbnail_str);
+  printChoice("3", "Add metadata: " + add_metadata_str);
   print("\nUsing '", g.files.program_dir, "' as the program's directory.\n");
   print("\n");
   printChoice("9", "Back");
@@ -291,7 +302,13 @@ inline void stateSettings() {
     g.settings.add_thumbnail = !g.settings.add_thumbnail;
     add_thumbnail_str = (g.settings.add_thumbnail) ? "Yes" : "No";
     LOG("[Settings] Add thumbnail: " + add_thumbnail_str);
-  } else if (inp == "9" || inp == "q" || inp == "0") {
+  } else if (inp == "3") {
+    g.settings.add_metadata = !g.settings.add_metadata;
+    add_metadata_str = (g.settings.add_metadata) ? "Yes" : "No";
+    LOG("[Settings] Add thumbnail: " + add_metadata_str);
+  }
+
+  else if (inp == "9" || inp == "q" || inp == "0") {
     g.state = AppState::MainMenu;
   }
 

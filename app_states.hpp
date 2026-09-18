@@ -43,7 +43,7 @@ inline void stateMainMenu() {
     g.state = AppState::Settings;
   } else if (inp == "3") {
     g.state = AppState::Help;
-  } else if (inp == "9") {
+  } else if (inp == "9" || inp == "q" || inp == "0") {
     g.state = AppState::Quit;
   }
 }
@@ -162,7 +162,7 @@ inline void stateDownloading(std::string URL = "") {
   print("> ");
   std::string inp = funcs::getKeyPress();
 
-  if (inp == "0") {
+  if (inp == "9" || inp == "q" || inp == "0") {
     g.state = AppState::MainMenu;
     return;
   }
@@ -286,7 +286,7 @@ inline void stateSettings() {
     g.settings.add_thumbnail = !g.settings.add_thumbnail;
     add_thumbnail_str = (g.settings.add_thumbnail) ? "Yes" : "No";
     LOG("[Settings] Add thumbnail: " + add_thumbnail_str);
-  } else if (inp == "9") {
+  } else if (inp == "9" || inp == "q" || inp == "0") {
     g.state = AppState::MainMenu;
   }
 
@@ -294,7 +294,6 @@ inline void stateSettings() {
 }
 
 inline void stateHelp() {
-
   static constexpr const char *LOGO = R"(▖▖  ▜   
 ▙▌█▌▐ ▛▌
 ▌▌▙▖▐▖▙▌
@@ -303,19 +302,20 @@ inline void stateHelp() {
   print(LOGO, "\n");
   Globals &g = Globals::getInstance();
 
-  printChoice("9", "Return to start");
-
-  std::string inp = funcs::getKeyPress();
-  if (inp == "9") {
-    g.state = AppState::MainMenu;
-  }
-
-  print("Autoplay is a program written by HassanIQ777 "
+  print("\nAutoplay ", g.VERSION,
+        " is a program written by HassanIQ777 "
         "(https://github.com/hassaniq777)\n");
   print("Its purpose is to quickly but temporarily download media and play, "
         "you can optionally keep it too.\n\n");
   printHelp();
   print("\n\n");
   print("Note: audio only is the default downloading option, so you can just "
-        "hit 'Enter' to choose it\n");
+        "hit 'Enter' to choose it.\n\n");
+
+  printChoice("9", "Return to start");
+
+  std::string inp = funcs::getKeyPress();
+  if (inp == "9" || inp == "q" || inp == "0") {
+    g.state = AppState::MainMenu;
+  }
 }

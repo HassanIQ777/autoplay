@@ -176,7 +176,6 @@ inline void stateDownloading(std::string URL = "") {
       " --downloader-args " +
       shq("aria2c:-x 16 -s 16 -k 1M") +
       " --embed-metadata"
-      " --embed-thumbnail"
       " --ignore-errors"
       " --sleep-subtitles 2"
       " --user-agent " +
@@ -190,6 +189,9 @@ inline void stateDownloading(std::string URL = "") {
   // older/different yt-dlp binary that lacks it.
   if (commandExists("deno") && ytdlpSupportsJsRuntimes()) {
     commonFlags += " --js-runtimes deno";
+  }
+  if (g.settings.add_thumbnail) {
+    commonFlags += " --embed-thumbnail";
   }
 
   static const std::string videoFlags = "--merge-output-format mkv"
@@ -226,9 +228,11 @@ inline void stateDownloading(std::string URL = "") {
       joinOutPath(g.settings.download_dir, "%(title)s.%(ext)s");
   cmd += " -o " + shq(outPath) + " " + shq(URL);
 
+  bool download_failed = false;
   int rc = system(cmd.c_str());
   if (rc != 0) {
     LOG("[!] yt-dlp exited with a non-zero status.");
+    download_failed = true;
   }
 
   std::string title = getSanitizedTitle(URL);
@@ -238,6 +242,7 @@ inline void stateDownloading(std::string URL = "") {
 
   if (!File::isfile(downloadedPath)) {
     print("[autoplay] Failed to download media.\n");
+    download_failed = true;
     funcs::getKeyPress();
     g.state = AppState::MainMenu;
     return;
@@ -303,7 +308,7 @@ inline void stateHelp() {
   Globals &g = Globals::getInstance();
 
   print("\nAutoplay ", g.VERSION,
-        " is a program written by HassanIQ777 "
+        "\nA program written by HassanIQ777 "
         "(https://github.com/hassaniq777)\n");
   print("Its purpose is to quickly but temporarily download media and play, "
         "you can optionally keep it too.\n\n");

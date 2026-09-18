@@ -3,9 +3,6 @@
 #include "helpers.hpp"
 #include "libutils/CLIParser.hpp"
 
-// TODO: Add more logging with LOG()
-// TODO: Add AppState::Help
-
 int main(int argc, char **argv) {
   Globals &g = Globals::getInstance();
   g.parser.setArgs(argc, argv);

@@ -92,7 +92,9 @@ inline void stateWatching(const std::string &path) {
             "\" -n is.xyz.mpv/.MPVActivity";
         system(command.c_str());
       } else {
-        std::string cmd = "mpv " + shq(path);
+        std::string cmd = "mpv "
+        "--audio-display=no "
+        + shq(path);
         int rc = system(cmd.c_str());
         if (rc != 0) {
           auto msg = "[!] mpv exited with a non-zero status.";
@@ -222,8 +224,7 @@ inline void stateDownloading(std::string URL = "") {
   std::string cmd = "yt-dlp ";
   if (audioOnly) {
     cmd += "-x --audio-format mp3 --audio-quality 0 --no-video "
-           "--audio-display=no " +
-           commonFlags;
+           + commonFlags;
   } else {
     cmd += "-f " + shq(format) + " " + commonFlags + " " + videoFlags;
   }
@@ -254,7 +255,10 @@ inline void stateDownloading(std::string URL = "") {
       g.state = AppState::MainMenu;
       return;
     }
+    funcs::clearTerminal();
+    printLogo();
     stateDownloading(URL);
+    return;
   }
 
   stateWatching(downloadedPath);

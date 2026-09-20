@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   LOG("User started program");
 
   if (funcs::hasSequence(g.parser.getArg(1), "http")) {
-    LOG("Immediately stated download for (" + g.parser.getArg(1) + "'");
+    LOG("Immediately started download for (" + g.parser.getArg(1) + "'");
     g.state = AppState::Downloading;
     funcs::clearTerminal();
     printLogo(); // بدون مجاملة

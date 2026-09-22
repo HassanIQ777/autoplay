@@ -80,7 +80,7 @@ inline void stateWatching(const std::string &path) {
     printChoice("1", "Play");
     printChoice("2", "Delete media");
     print("\n");
-    printChoice("9", "Return to start");
+    printChoice("9", "Keep media");
 
     std::string inp = funcs::getKeyPress();
     if (inp == "1") {
@@ -93,8 +93,8 @@ inline void stateWatching(const std::string &path) {
         system(command.c_str());
       } else {
         std::string cmd = "mpv "
-        "--audio-display=no "
-        + shq(path);
+                          "--audio-display=no " +
+                          shq(path);
         int rc = system(cmd.c_str());
         if (rc != 0) {
           auto msg = "[!] mpv exited with a non-zero status.";
@@ -172,14 +172,15 @@ inline void stateDownloading(std::string URL = "") {
   print("\nStarted downloading...\n");
   LOG("Started downloading: (" + URL = ")");
 
+  static int sleep_subsitles = 1;
   // --- flags shared by every mode ---
   std::string commonFlags =
       "--downloader aria2c"
       " --downloader-args " +
       shq("aria2c:-x 16 -s 16 -k 1M") +
       " --ignore-errors"
-      " --sleep-subtitles 2"
-      " --user-agent " +
+      " --sleep-subtitles " +
+      funcs::str(sleep_subsitles) + " --user-agent " +
       shq("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
           "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
 
@@ -223,8 +224,7 @@ inline void stateDownloading(std::string URL = "") {
 
   std::string cmd = "yt-dlp ";
   if (audioOnly) {
-    cmd += "-x --audio-format mp3 --audio-quality 0 --no-video "
-           + commonFlags;
+    cmd += "-x --audio-format mp3 --audio-quality 0 --no-video " + commonFlags;
   } else {
     cmd += "-f " + shq(format) + " " + commonFlags + " " + videoFlags;
   }
@@ -247,11 +247,12 @@ inline void stateDownloading(std::string URL = "") {
   if (!File::isfile(downloadedPath)) {
     print("[autoplay] Failed to download media.\n");
     download_failed = true;
+    sleep_subsitles += 1;
   }
 
   if (download_failed) {
-    auto inp = Input::readline<std::string>("\nRetry download [Y/n]? ");
-    if (funcs::uppercase(*inp) == "N") {
+    auto choice = Input::readline<std::string>("\nRetry download [Y/n]? ");
+    if (funcs::uppercase(*choice) == "N") {
       g.state = AppState::MainMenu;
       return;
     }

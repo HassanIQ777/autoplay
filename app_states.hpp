@@ -250,9 +250,11 @@ inline void stateDownloading(std::string URL = "") {
   }
 
   if (download_failed) {
-    sleep_subsitles += 1;
-    print("[Settings] sleep subtitles has been increased to ", sleep_subsitles,
-          " seconds.\n\n");
+    if (!audioOnly) { // only inscrease cooldown if it's video
+      sleep_subsitles += 1;
+      print("[Settings] sleep subtitles has been increased to ",
+            sleep_subsitles, " seconds.\n\n");
+    }
     auto choice = Input::readline<std::string>("\nRetry download [Y/n]? ");
     if (funcs::uppercase(*choice) == "N") {
       g.state = AppState::MainMenu;
@@ -277,16 +279,17 @@ inline void stateSettings() {
   Globals &g = Globals::getInstance();
 
   std::string download_path = g.settings.download_dir;
-  std::string add_thumbnail_str = (g.settings.add_thumbnail) ? "Yes" : "No";
   std::string add_metadata_str = (g.settings.add_metadata) ? "Yes" : "No";
+  std::string add_thumbnail_str = (g.settings.add_thumbnail) ? "Yes" : "No";
   if (!download_path.empty()) {
     download_path = fs::absolute(g.settings.download_dir);
   }
   print("\nUsing '", g.files.program_dir, "' as the program's directory.\n");
   print("\n");
   printChoice("1", "Download path: " + download_path);
-  printChoice("2", "Add thumbnail: " + add_thumbnail_str);
-  printChoice("3", "Add metadata: " + add_metadata_str);
+  printChoice("2", "Add metadata: " + add_metadata_str);
+  printChoice("3", "Add thumbnail: " + add_thumbnail_str);
+  print("\n");
   printChoice("9", "Back");
 
   const std::string inp = funcs::getKeyPress();
@@ -305,11 +308,11 @@ inline void stateSettings() {
     g.settings.download_dir = *path;
     LOG("[Settings] Changed download path to: '" + *path + "'");
 
-  } else if (inp == "2") {
+  } else if (inp == "3") {
     g.settings.add_thumbnail = !g.settings.add_thumbnail;
     add_thumbnail_str = (g.settings.add_thumbnail) ? "Yes" : "No";
     LOG("[Settings] Add thumbnail: " + add_thumbnail_str);
-  } else if (inp == "3") {
+  } else if (inp == "2") {
     g.settings.add_metadata = !g.settings.add_metadata;
     add_metadata_str = (g.settings.add_metadata) ? "Yes" : "No";
     LOG("[Settings] Add metadata: " + add_metadata_str);

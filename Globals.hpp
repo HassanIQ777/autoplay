@@ -28,9 +28,11 @@ struct Settings {
   }
 
   json toJson() const {
-    return json{{"download_dir", download_dir},
-                {"add_thumbnail", add_thumbnail},
-                {"add_metadata", add_metadata}};
+    return json{
+        {"add_metadata", add_metadata},
+        {"add_thumbnail", add_thumbnail},
+        {"download_dir", download_dir},
+    };
   }
 
   void save(const std::string &filepath) {

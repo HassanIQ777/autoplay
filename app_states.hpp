@@ -172,7 +172,7 @@ inline void stateDownloading(std::string URL = "") {
   print("\nStarted downloading...\n");
   LOG("Started downloading: (" + URL = ")");
 
-  static int sleep_subsitles = 1;
+  static int sleep_subsitles = 2;
   // --- flags shared by every mode ---
   std::string commonFlags =
       "--downloader aria2c"
@@ -247,10 +247,12 @@ inline void stateDownloading(std::string URL = "") {
   if (!File::isfile(downloadedPath)) {
     print("[autoplay] Failed to download media.\n");
     download_failed = true;
-    sleep_subsitles += 1;
   }
 
   if (download_failed) {
+    sleep_subsitles += 1;
+    print("[Settings] sleep subtitles has been increased to ", sleep_subsitles,
+          " seconds.\n\n");
     auto choice = Input::readline<std::string>("\nRetry download [Y/n]? ");
     if (funcs::uppercase(*choice) == "N") {
       g.state = AppState::MainMenu;
@@ -280,11 +282,11 @@ inline void stateSettings() {
   if (!download_path.empty()) {
     download_path = fs::absolute(g.settings.download_dir);
   }
+  print("\nUsing '", g.files.program_dir, "' as the program's directory.\n");
+  print("\n");
   printChoice("1", "Download path: " + download_path);
   printChoice("2", "Add thumbnail: " + add_thumbnail_str);
   printChoice("3", "Add metadata: " + add_metadata_str);
-  print("\nUsing '", g.files.program_dir, "' as the program's directory.\n");
-  print("\n");
   printChoice("9", "Back");
 
   const std::string inp = funcs::getKeyPress();
@@ -310,7 +312,7 @@ inline void stateSettings() {
   } else if (inp == "3") {
     g.settings.add_metadata = !g.settings.add_metadata;
     add_metadata_str = (g.settings.add_metadata) ? "Yes" : "No";
-    LOG("[Settings] Add thumbnail: " + add_metadata_str);
+    LOG("[Settings] Add metadata: " + add_metadata_str);
   }
 
   else if (inp == "9" || inp == "q" || inp == "0") {
@@ -339,7 +341,7 @@ inline void stateHelp() {
   print("Note: audio only is the default downloading option, so you can just "
         "hit 'Enter' to choose it.\n\n");
 
-  printChoice("9", "Return to start");
+  printChoice("9", "Back");
 
   std::string inp = funcs::getKeyPress();
   if (inp == "9" || inp == "q" || inp == "0") {

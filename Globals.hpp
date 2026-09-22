@@ -12,17 +12,17 @@ using funcs::print;
 using json = nlohmann::json;
 
 struct Settings {
-  std::string download_dir = "";
-  bool add_thumbnail = true;
   bool add_metadata = true;
+  bool add_thumbnail = true;
+  std::string download_dir = "";
 
   static Settings defaults() { return Settings{}; }
 
   static Settings fromJson(const json &j) {
     Settings s = defaults(); // start from defaults
-    s.download_dir = j.value("download_dir", s.download_dir);
-    s.add_thumbnail = j.value("add_thumbnail", s.add_thumbnail);
     s.add_thumbnail = j.value("add_metadata", s.add_metadata);
+    s.add_thumbnail = j.value("add_thumbnail", s.add_thumbnail);
+    s.download_dir = j.value("download_dir", s.download_dir);
 
     return s;
   }
